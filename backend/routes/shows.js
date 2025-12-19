@@ -3,7 +3,6 @@ const Show = require('../models/Show');
 
 const router = express.Router();
 
-// Get all shows with caching
 router.get('/', async (req, res) => {
   try {
     const cache = req.app.locals.cache;
@@ -21,7 +20,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Get show by ID
 router.get('/:id', async (req, res) => {
   try {
     const cache = req.app.locals.cache;

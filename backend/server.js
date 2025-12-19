@@ -9,16 +9,29 @@ const showRoutes = require('./routes/shows');
 const bookingRoutes = require('./routes/bookings');
 
 const app = express();
-const cache = new NodeCache({ stdTTL: 600 }); // 10 minutes cache
+const cache = new NodeCache({ stdTTL: 600 }); 
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Make cache available globally
 app.locals.cache = cache;
 
-// Database connection
+app.get('/debug/cache', (req, res) => {
+  const cache = req.app.locals.cache;
+  if (!cache) return res.status(500).json({ message: 'Cache not initialized' });
+
+  const cacheKeys = cache.keys();
+  const cacheData = {};
+  cacheKeys.forEach(key => {
+    cacheData[key] = cache.get(key);
+  });
+
+  res.json({ keys: cacheKeys, values: cacheData });
+});
+
+
+
+
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));

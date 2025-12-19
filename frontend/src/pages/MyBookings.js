@@ -11,7 +11,11 @@ const MyBookings = () => {
 
   const fetchBookings = () => {
     bookingsAPI.getAll()
-      .then(response => setBookings(response.data))
+      .then(response => {
+        // Filter out bookings where show is null
+        const validBookings = response.data.filter(b => b.show !== null);
+        setBookings(validBookings);
+      })
       .catch(error => console.error('Error fetching bookings:', error))
       .finally(() => setLoading(false));
   };
@@ -63,33 +67,33 @@ const MyBookings = () => {
     cursor: 'pointer'
   };
 
-  if (loading) return <div style={{padding: '2rem'}}>Loading bookings...</div>;
+  if (loading) return <div style={{ padding: '2rem' }}>Loading bookings...</div>;
 
   return (
     <div style={containerStyle}>
       <h1>My Bookings</h1>
       {bookings.length === 0 ? (
-        <div style={{textAlign: 'center', padding: '2rem'}}>
+        <div style={{ textAlign: 'center', padding: '2rem' }}>
           <p>No bookings found</p>
         </div>
       ) : (
         bookings.map(booking => (
           <div key={booking._id} style={bookingCardStyle}>
             <div>
-              <h3>{booking.show.title}</h3>
+              <h3>{booking.show ? booking.show.title : 'Show not available'}</h3>
               <p>Seats: {booking.seats}</p>
               <p>Amount: ₹{booking.totalAmount}</p>
               <p>Booked on: {new Date(booking.createdAt).toLocaleDateString()}</p>
               {booking.paymentId && <p>Payment ID: {booking.paymentId}</p>}
             </div>
-            <div style={{textAlign: 'right'}}>
+            <div style={{ textAlign: 'right' }}>
               <div style={statusStyle(booking.status)}>
                 {booking.status.toUpperCase()}
               </div>
               {booking.status === 'confirmed' && (
                 <button 
                   onClick={() => handleCancel(booking._id)}
-                  style={{...buttonStyle, marginTop: '1rem'}}
+                  style={{ ...buttonStyle, marginTop: '1rem' }}
                 >
                   Cancel & Refund
                 </button>
